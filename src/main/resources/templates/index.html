@@ -1,0 +1,398 @@
+<!DOCTYPE html >
+<html ng-app="TestBackJava">
+<head>
+<meta charset="ISO-8859-1">
+<title>SantanderTecnologia</title>
+<script src="js/jquery.js"></script>
+<script src="js/angular.js"></script>
+<script src="js/angular-messages.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/bootstrap-table.min.js"></script>
+<script src="js/bootstrap-table-pt-BR.min.js"></script>
+<script src="js/bootstrap3-typeahead.js"></script>
+
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="css/testbackjava.css">
+<link rel="stylesheet" type="text/css" href="css/bootstrap-table.css">
+
+</head>
+<body ng-controller="HomeController">
+
+
+	<div class="container-fluid">
+		<div class="row vertical-align-center header">
+			<div class="col-sm-4">
+				<img ng-src="{{logo}}" alt="Description" />
+			</div>
+			<div class="col-sm-4"></div>
+			<div ng-show="!userLogado.isLogado" class="col-sm-4 input-group right">
+				<form name="loginForm">
+					<div class="vertical-align-bottom">
+						<div class="col-sm-3">
+							C&oacute;digo: <input class="form-control" type="text" value="{{user.codigoUsuario}}" name="codigoUsuario" ng-model="user.codigoUsuario" ng-required="true" ng-minlength="1" ng-maxlength="6" placeholder="000000" />
+						</div>
+						<div class="col-sm-4">
+							Password: <input class="form-control" type="password" value="{{user.senha}} " name="senha" ng-model="user.senha" ng-required="true" ng-minlength="1" ng-maxlength="6" placeholder="Password" />
+						</div>
+						<div class="col-md-2 align-middle">
+							<button class="btn btn-md" ng-click="entrar(user)">Entrar</button>
+						</div>
+					</div>
+				</form>
+			</div>
+
+			<div ng-show="userLogado.isLogado" class="col-sm-4 input-group right">
+				<div class="vertical-align-bottom">
+					<div class="col-sm-3">{{userLogado.nome}}</div>
+					<div class="col-sm-4"></div>
+					<div class="col-md-2 align-middle">
+						<button class="btn btn-md" ng-click="sair()">Sair</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div ng-show="message.message" class="alert alert-danger">
+		<span>{{message.message}}</span>
+	</div>
+	<div id="divMessage" class="alert alert-danger hide">
+		<span id="message"></span>
+	</div>
+	<div ng-show="userLogado.isLogado">
+		<div class="menu">
+			<ul class="nav">
+				<li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle"> Funcionalides <b class="caret"></b>
+				</a>
+					<div class="dropdown-menu col-sm-2">
+						<div class="row-fluid">
+							<div class="span4">
+								<ul>
+									<li class="nav-header"><a ng-click=listarGastos(filtro)> Listagem de gastos </a></li>
+									<li class="nav-header"><a ng-click=mostrarGastosPorFiltro()> Filtro </a></li>
+								</ul>
+							</div>
+						</div>
+					</div></li>
+			</ul>
+		</div>
+	</div>
+	<!-- Filtro -->
+	<div ng-show="dataGastos || filtroGastos">
+		<form name="filtroForm">
+			<div class="container-fluid">
+				<fieldset class="scheduler-border">
+					<legend class="scheduler-border">Filtro:</legend>
+					<div class="row mBottom">
+						<div class="col-sm-1">
+							<label> Data:</label>
+						</div>
+						<div class="col-sm-2">
+							<input type="date" name="data" ng-model="filtro.data" value="{{filtro.data}}" maxlength="10">
+							<button class="btn btn-md" ng-click="listarGastos(filtro)">Filtrar</button>
+						</div>
+					</div>
+				</fieldset>
+				<hr>
+			</div>
+		</form>
+	</div>
+
+	<div ng-show="dataGastos">
+		<div class="container-fluid">
+			<table id="table" class="table table-bordered table-striped " data-id-field="id" data-unique-id-field="id" data-pagination="true" data-page-size="10" data-sort-name="valor" data-sort-order="desc">
+				<thead>
+					<tr>
+						<th data-field="id"        data-visible="false">Id</th>
+						<th data-field="data"      data-halign="center" data-align="center" data-sortable="true" data-formatter="dateFormat">Data</th>
+						<th data-field="descricao" data-halign="center" data-align="venter" data-sortable="true">Descri&ccedil;&atilde;o</th>
+						<th data-field="valor"     data-halign="center" data-align="right" data-sortable="true" data-formatter="fixedFormat">Valor</th>
+						<th data-field="categoria" data-halign="center" data-align="left" data-sortable="true" data-formatter="categoriaFormat">Categoria</th>
+					</tr>
+				</thead>
+				<tbody>
+
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div id="modal" class="modal fade" role="dialog" tabindex="-1" data-toggle="modal">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Detalhes</h4>
+				</div>
+				<div class="modal-body">
+					<div class="fluid input-group form-horizontal" style="width: 100%;">
+						<div class="row">
+							<div class="col-sm-2 ">
+								<label>Usu&aacute;rio</label>
+							</div>
+							<div class="col-sm-10">
+								<input type="text" value="{{userLogado.nome}}" class="form-control" disabled />
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-sm-2 ">
+								<label>ID &Uacute;nico</label>
+							</div>
+							<div class="col-sm-10">
+								<input id="id" name="id" type="text" value="" class="form-control" disabled />
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-sm-2">
+								<label>Data</label>
+							</div>
+							<div class="col-sm-10">
+								<input id="data" type="text" value="" class="form-control" disabled />
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-sm-2">
+								<label>Descri&ccedil;&atilde;o</label>
+							</div>
+							<div class="col-sm-10">
+								<input id="descricao" type="text" value="" class="form-control" disabled />
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-sm-12 text-center">
+								<hr>
+							</div>
+						</div>
+						<form categoriaForm>
+						<div class="row">
+							<div class="col-sm-2">
+								<label>Categoria</label>
+							</div>
+							<div class="col-sm-10">
+								<input id="categoria" name="categoria" class="form-control typeahead" data-provide="typeahead" type="text" value="{{categoria}}" ng-model="categoria" ng-required="true" ng-minlength="1" ng-maxlength="50" placeholder="Seja o primeiro a incluir uma nova categoria!" />
+							</div>
+						</div>
+
+						<div id="divSugestoes" class="row hidden">
+							<div class="col-sm-2">
+								<label>Sugest&otilde;es:</label>
+							</div>
+							<div class="col-sm-10">
+								<select id="sugestoes" class="form-control"></select>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-12 text-center">
+								<br>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-6  text-center">
+								<button class="btn btn-md" ng-click="categorizar(categoria)">Salvar</button>
+							</div>
+							<div class="col-sm-6  text-center">
+								<button class="btn btn-md" data-dismiss="modal">Cancelar</button>
+							</div>
+						</div>
+						</form>
+					</div>
+				</div>
+
+			</div>
+</body>
+
+<script>
+	angular.module("TestBackJava", [ "ngMessages" ]);
+	angular.module("TestBackJava").controller("HomeController", function($scope, $http, $location) {
+		$scope.title = "TestBackJava";
+		$scope.logo = "img/logo.png";
+		$scope.filtro = {
+			"codigoUsuario" : null,
+			"data" : null
+		}
+		$scope.filtroGastos = false;
+		$scope.user = {
+			"codigoUsuario" : 6,
+			"senha" : '6'
+		};
+		$scope.message = {
+			message : null
+		};
+		$scope.categoria = "";
+		// functions - separar
+		$scope.entrar = function(user) {
+			if (user.codigoUsuario == '' || user.senha == '') {
+				alert('Erro');
+			} else {
+				$http({
+					url : location + '/entrar',
+					method : "POST",
+					data : {
+						"codigoUsuario" : user.codigoUsuario,
+						"senha" : user.senha
+					}
+				}).then(function(response) {
+					$scope.userLogado = response.data;
+					$scope.filtro.codigoUsuario = $scope.userLogado.codigoUsuario;
+					$scope.message = null;
+					$scope.user = null;
+				}, function(response) {
+					console.log('fail');
+					$scope.message = response.data;
+				});
+			}
+		}
+		//--
+		$scope.mostrarGastosPorFiltro = function() {
+			$scope.filtroGastos = true;
+		}
+
+		$scope.listarGastos = function(filtro) {
+			$scope.dataGastos = [];
+			$http({
+				url : location + '/listarGastos',
+				method : "POST",
+				data : {
+					'codigoUsuario' : filtro.codigoUsuario,
+					"data" : filtro.data
+				}
+			}).then(function(response) {
+				$scope.message = null;
+
+				$('#table').bootstrapTable('destroy')
+				$('#table').bootstrapTable({
+					data : response.data
+				});
+
+			}, function(response) {
+				console.log('fail');
+				$scope.message = response.data;
+				$scope.dataGastos = null;
+			});
+		}
+
+		$scope.categorizar = function(categoria) {
+			var id = angular.element('#id').val();
+			$http({
+				url : location + '/listarGastos',
+				method : "POST",
+				data : {
+					'codigoUsuario' : filtro.codigoUsuario,
+					"data" : filtro.data
+				}
+			}).then(function(response) {
+				$scope.message = null;
+
+				$('#table').bootstrapTable('destroy')
+				$('#table').bootstrapTable({
+					data : response.data
+				});
+
+			}, function(response) {
+				console.log('fail');
+				$scope.message = response.data;
+				$scope.dataGastos = null;
+			});
+		}
+
+	});
+
+	function dateFormat(value) {
+		var d = new Date(value);
+		return d.toLocaleString();
+	}
+	function onlyDigits(value) {
+		return value.toString().replace(/\D/g, "");
+	}
+
+	function fixedFormat(value) {
+		var n = parseFloat(value);
+		return n.toFixed(2);
+	}
+
+	function categoriaFormat(value, row, index, field) {
+		var id = row['id'];
+		var codigoUsu
+		if (value == null) {
+			var newDirective = '<a onclick="javascript:getDetail(\'' + id + '\')" data-toggle="modal" data-target="#modal">Categorizar</a>'
+
+			return newDirective;
+		} else {
+			return value;
+		}
+
+	}
+
+	function getDetail(id) {
+		var location = window.location.href;
+		$.ajax({
+			url : location + 'findById',
+			type : "POST",
+			contentType : "application/json; charset=utf-8",
+			dataType : 'text',
+			data : JSON.stringify({
+				"id" : id
+			}),
+			success : function(data) {
+				exibir(data);
+			},
+			error : function(data) {
+				if (data.responseJSON != '') {
+					$('#message').text('data.responseJSON');
+					$('#divMessage').show();
+				}
+			},
+			timeout : 15000
+		});
+
+	}
+	comboTextSelect('#categoria', '#sugestoes')
+	function exibir(data) {
+		var content = JSON.parse(data);
+		console.log(content);
+		$('#id').val(content['id']);
+		$('#data').val(dateFormat(content['data']));
+		$('#descricao').val(content['descricao']);
+		$('#categoria').val('');
+		var dica = content['categoria'];
+		if (dica != null ) {
+			$('#categoria').attr("placeholder","Melhor dica: Selecione " + dica + " abaixo.");
+		}
+		$('#divSugestoes').addClass('hidden');
+		var sugestoesList = '';
+		var autoComplete = [];
+		$('#sugestoes').empty();
+		$('.typeahead').typeahead('destroy')
+		
+		$.each(content['categorias'], function(key, value) {
+			var categoria = value['categoria'];
+			sugestoesList += '<option value="' + categoria + '">' + categoria	 + '</option>';
+			autoComplete.push(categoria);
+		});
+		if (sugestoesList != '') {
+			$('#divSugestoes').removeClass('hidden');
+			$('#sugestoes').append(sugestoesList);	
+			comboTextSelect('#categoria', '#sugestoes')
+			
+		}
+		$(".typeahead").typeahead({
+		  source: autoComplete,
+		  autoSelect: true
+		});
+		$('#modal').modal('show')
+	}
+	
+	function comboTextSelect(textId, selectId) {
+		$(textId).bind('focusout', function() { 
+			$(selectId).val('');
+			$(selectId + ' option[value="' + $(textId).val().trim().toUpperCase() +'"]').prop('selected',true); 
+		});
+		$(selectId).change(function() {$(textId).val($(selectId).val()).change() });
+	}
+</script>
+
+</html>
