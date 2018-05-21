@@ -18,7 +18,7 @@ function categoriaFormat(value, row, index, field) {
 	var id = row['id'];
 	var codigoUsu
 	if (value == null) {
-		var newDirective = '<a onclick="javascript:getDetail(\'' + id + '\')" data-toggle="modal" data-target="#modal">Categorizar</a>'
+		var newDirective = '<a onclick="javascript:getDetail(\'' + id + '\')" data-toggle="modal" data-target="#modal">-Categorizar-</a>'
 
 		return newDirective;
 	} else {

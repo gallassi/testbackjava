@@ -10,4 +10,6 @@ public interface RankRepository extends CassandraRepository<Rank, String>{
 	@Query("select * from RANK where descricao=?0 allow filtering")
 	public List<Rank> listarCategoriasUtilizadasPorDescricao(String descricao);
 
+	@Query("select * from RANK where categoria = ?0 and descricao=?1 allow filtering")
+	public List<Rank> obterCategoriasPorIDDescricao(String categoria, String descricao);
 }

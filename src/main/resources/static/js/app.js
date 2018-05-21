@@ -2,7 +2,7 @@
 //FIXME Separar em factory
 
 angular.module("TestBackJava", [ "ngMessages" ]);
-	angular.module("TestBackJava").controller("HomeController", function($scope, $http, $location) {
+	angular.module("TestBackJava").controller("HomeController", function($scope, $http, $location ) {
 		$scope.title = "TestBackJava";
 		$scope.logo = "img/logo.png";
 		$scope.filtro = {
@@ -19,6 +19,9 @@ angular.module("TestBackJava", [ "ngMessages" ]);
 		};
 		$scope.categoria = "";
 		// functions - separar
+		$scope.sair = function() {
+			location.reload();
+		}
 		$scope.entrar = function(user) {
 			if (user.codigoUsuario == '' || user.senha == '') {
 				alert('Erro');
@@ -58,7 +61,7 @@ angular.module("TestBackJava", [ "ngMessages" ]);
 			}).then(function(response) {
 				$scope.message = null;
 
-				$('#table').bootstrapTable('destroy')
+				$('#table').bootstrapTable('destroy');
 				$('#table').bootstrapTable({
 					data : response.data
 				});
@@ -73,25 +76,28 @@ angular.module("TestBackJava", [ "ngMessages" ]);
 		$scope.categorizar = function(categoria) {
 			var id = angular.element('#id').val();
 			$http({
-				url : location + '/listarGastos',
+				url : location + '/salvarCategoria',
 				method : "POST",
 				data : {
-					'codigoUsuario' : filtro.codigoUsuario,
-					"data" : filtro.data
+					'id' : id,
+					"categoria" : categoria
 				}
 			}).then(function(response) {
-				$scope.message = null;
-
-				$('#table').bootstrapTable('destroy')
-				$('#table').bootstrapTable({
-					data : response.data
+				$scope.message = 'Categoria inserida';
+				$('#modal').modal('hide');
+				$scope.listarGastos({
+					'codigoUsuario' : $scope.userLogado.codigoUsuario,
+					"data" : $scope.filtro.data
+					
 				});
 
 			}, function(response) {
 				console.log('fail');
 				$scope.message = response.data;
 				$scope.dataGastos = null;
+				$('#modal').modal('hide');
 			});
 		}
-
+		
+		
 	});

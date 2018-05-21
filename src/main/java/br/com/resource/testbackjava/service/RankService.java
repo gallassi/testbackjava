@@ -2,7 +2,6 @@ package br.com.resource.testbackjava.service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -11,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import br.com.resource.testbackjava.data.Rank;
 import br.com.resource.testbackjava.data.RankRepository;
-import br.com.resource.testbackjava.data.User;
-import br.com.resource.testbackjava.vo.RankVO;
 
 @Service
 public class RankService {
@@ -32,8 +29,8 @@ public class RankService {
 		Rank opt = null;
 
 		if (rank.getCategoria() != null) {
-			Optional<Rank> tmp = this.repository.findById(rank.getCategoria());
-			opt = tmp != null && tmp.isPresent() ? tmp.get() : null;
+			List<Rank> tmp = this.repository.obterCategoriasPorIDDescricao(rank.getCategoria(), rank.getDescricao());
+			opt = tmp != null && !tmp.isEmpty() ? tmp.get(0) : null;
 		}
 
 		if (opt == null) {

@@ -73,7 +73,7 @@ public class HomeController {
 	
 	@ResponseBody
 	@RequestMapping(value = "salvarCategoria", method = { RequestMethod.GET, RequestMethod.POST }, consumes = { "application/json" })
-	public Object salvarCategoria(CreditCardOutgoingFilterVO filtro) throws MensagemTratadaException {
+	public Object salvarCategoria(@RequestBody CreditCardOutgoingFilterVO filtro) throws MensagemTratadaException {
 		creditCardOutgoingService.salvarCategoria(filtro);
 		return null;
 	}

@@ -51,7 +51,7 @@ public class CassandraRun implements CommandLineRunner {
 			ccos.add(cco);
 		}
 		
-		for (int i = 1; i < 20;i++) {
+		for (int i = 1; i < 7;i++) {
 			user = new User( i, "Fulano " + i, String.valueOf(i));
 			users.add(user);
 			for (int j = 0; j < i + 1; j++ ) {
